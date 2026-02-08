@@ -1,0 +1,44 @@
+# --- Python Standard ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environments ---
+venv/
+env/
+.venv/
+.env
+
+# --- Distribution / Packaging ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Editor / OS Settings ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# --- Post-Markem Specifics ---
+
+# 1. Raw Input Data
+*.html
+*.pdf
+*.xml
+
+# 2. Parsed Output & Analytics
+*.json
+*.csv
+*.xlsx
+*.parquet
+
+# 3. Visualizations
+*.png
+*.svg
+*.jpg
+*.jpeg
+
+# 4. Logs and Debugging
+*.log
