@@ -52,6 +52,9 @@ def get_competitors(f):
 
             number = cells[0].text.strip()
             place = cells[1].text.strip()
+            city = cells[3].text.strip()
+            club = cells[4].text.strip()
+            coach = cells[5].text.strip()
             
             name = cells[2].text.strip()
 
@@ -59,9 +62,9 @@ def get_competitors(f):
                 "number": number,
                 "place": place,
                 "name": " ".join(name.split()),
-                "city": cells[3].text.strip(),
-                "club": cells[4].text.strip(),
-                "coach": cells[5].text.strip()
+                "city": " ".join(city.split()),
+                "club": " ".join(club.split()),
+                "coach": " ".join(coach.split())
             })
 
     return data

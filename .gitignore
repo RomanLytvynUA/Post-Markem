@@ -42,3 +42,4 @@ dist/
 
 # 4. Logs and Debugging
 *.log
+sb.py
