@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def get_panel_final_accuracy(final_marks_df):
@@ -101,3 +102,101 @@ def get_overall_panel_final_bias(final_marks):
     cols = ['judge', 'couple', 'overall_bias'] + dance_cols
     
     return full_report[cols]
+
+
+def get_correlation_pairs(df):
+    """
+    Calculates pairwise correlation for one dance.
+    Returns: DataFrame [judge_1, judge_2, correlation]
+    """
+    judge_cols = [c for c in df.columns if len(c) == 1 and c.isalpha()]
+    
+    if len(judge_cols) < 2:
+        return pd.DataFrame(columns=['judge_1', 'judge_2', 'correlation'])
+
+    corr_matrix = df[judge_cols].astype(float).corr(method='spearman')
+    
+    # 3. Mask Lower Triangle & Diagonal (Keep Upper Triangle only)
+    # k=1 excludes the diagonal (self-correlation)
+    mask = np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
+    
+    # 4. Flatten to List
+    # .where(mask) sets lower triangle to NaN
+    # .stack() drops NaNs, keeping only unique A-B pairs
+    pairs = corr_matrix.where(mask).stack().reset_index()
+    pairs.columns = ['judge_1', 'judge_2', 'correlation']
+    
+    unique_pairs = pairs[pairs['judge_1'] < pairs['judge_2']].copy()
+
+    return unique_pairs
+
+def get_coalition_report(dances: dict) -> pd.DataFrame:
+    """
+    Aggregates correlation pairs across all dances.
+    Returns: [judge_1, judge_2, overall_score, W, T, V...]
+    """
+    all_dance_pairs = []
+    
+    for dance_name, df in dances.items():
+        # Get pairs for this dance
+        dance_pairs = get_correlation_pairs(df)
+        
+        if dance_pairs.empty:
+            continue
+            
+        # Rename 'correlation' to the specific dance name
+        dance_pairs = dance_pairs.rename(columns={'correlation': dance_name})
+        
+        # Set Index for merging
+        dance_pairs = dance_pairs.set_index(['judge_1', 'judge_2'])
+        all_dance_pairs.append(dance_pairs)
+            
+    if not all_dance_pairs:
+        return pd.DataFrame(columns=['judge_1', 'judge_2', 'overall_score'])
+
+    # Merge all dances (Outer Join aligns A-B correctly across dances)
+    full_report = pd.concat(all_dance_pairs, axis=1)
+    
+    # Calculate Overall Score (Mean)
+    full_report['overall_score'] = full_report.mean(axis=1)
+    
+    # Cleanup & Sort
+    full_report = full_report.reset_index()
+    full_report = full_report.sort_values(by='overall_score', ascending=False)
+    
+    # Reorder
+    dance_cols = [c for c in full_report.columns if c not in ['judge_1', 'judge_2', 'overall_score']]
+    final_cols = ['judge_1', 'judge_2', 'overall_score'] + dance_cols
+    
+    return full_report[final_cols]
+
+
+def find_voting_blocs(report, threshold = 0.85):
+    """
+    Identifies groups of judges who consistently agree with each other
+    """
+    pairs = report[report['overall_score'] >= threshold].copy()
+    
+    blocs = []
+    
+    for _, row in pairs.iterrows():
+        j1, j2 = row['judge_1'], row['judge_2']
+        
+        # Search for existing blocs containing these judges
+        bloc_j1 = next((b for b in blocs if j1 in b), None)
+        bloc_j2 = next((b for b in blocs if j2 in b), None)
+
+        if bloc_j1 and bloc_j2 and bloc_j1 is not bloc_j2:
+            bloc_j1.update(bloc_j2)
+            blocs.remove(bloc_j2)
+        elif bloc_j1:
+            bloc_j1.add(j2)
+        elif bloc_j2:
+            bloc_j2.add(j1)
+        elif not bloc_j1 and not bloc_j2:
+            blocs.append({j1, j2})
+            
+    formatted_blocs = [sorted(list(b)) for b in blocs]
+    formatted_blocs.sort(key=len, reverse=True)
+    
+    return formatted_blocs
