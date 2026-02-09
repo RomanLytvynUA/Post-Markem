@@ -26,8 +26,8 @@ That said, provided that we have enough statistics and data to operate on, the v
 
 - [x] <b>Protocol parser</b> - module that ingests a competition protocol and presents the data in a format processable by the analyzers.
 - [x] <b>Maverick Score</b> - a deviation metric that quantifies how frequently an adjudicator's marks contradict the final calculated result.
-- [ ] <b>Bias Detector</b> - a directional metric that identifies when an adjudicator consistently marks a specific competitor significantly higher or lower than the panel average.
-- [ ] <b>Coalition Scanner</b> – a correlation matrix that detects "Block Voting" by identifying pairs of adjudicators with statistically unlikely agreement rates.
+- [x] <b>Bias Detector</b> - a directional metric that identifies when an adjudicator consistently marks a specific competitor significantly higher or lower than the panel average.
+- [x] <b>Coalition Scanner</b> – a correlation matrix that detects "Block Voting" by identifying pairs of adjudicators with statistically unlikely agreement rates.
 - [ ] <b>Weighted Simulation</b> - a "What If" engine that recalculates the results by applying a reliability weight to each adjudicator's vote.
 - [ ] <b>Trust Leaderboard</b> - a global ranking of adjudicators based on their cumulative impartiality and consistency scores across multiple events.
 
