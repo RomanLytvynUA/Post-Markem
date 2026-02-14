@@ -130,7 +130,7 @@ def get_correlation_pairs(df):
 
     return unique_pairs
 
-def get_coalition_report(dances: dict) -> pd.DataFrame:
+def get_coalition_report(dances):
     """
     Aggregates correlation pairs across all dances.
     Returns: [judge_1, judge_2, overall_score, W, T, V...]

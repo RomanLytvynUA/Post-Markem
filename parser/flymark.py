@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 from bs4 import BeautifulSoup
 from io import StringIO
 
@@ -70,7 +71,7 @@ def get_competitors(f):
     return data
 
 
-def get_final_marks(f):
+def get_final_marks(f, as_json=False):
     """
     Retrieve the marks for each dance in the final and return them as pandas dataframe
     """
@@ -93,4 +94,9 @@ def get_final_marks(f):
             df.set_index("number", inplace=True)
             data[dance] = df
             
+    if as_json:
+        return json.dumps({
+            dance: df.to_json(orient='split') 
+            for dance, df in data.items()
+        })
     return data
