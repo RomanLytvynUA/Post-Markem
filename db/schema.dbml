@@ -1,0 +1,49 @@
+Table people {
+  id integer [primary key]
+  name text
+  metadata jsonb
+}
+
+Table competitions {
+  id integer [primary key]
+  name text
+  date date
+  metadata jsonb
+}
+
+Table categories {
+  id integer [primary key]
+  competition_id integer [ref: > competitions.id]
+  name text
+  metadata jsonb
+}
+
+Table rounds {
+  id integer [primary key]
+  category_id integer [ref: > categories.id]
+  type text
+  metadata jsonb
+}
+
+Table adjudicators {
+  id integer [primary key]
+  round_id integer [ref: > rounds.id]
+  people_id integer [ref: > people.id]
+  letter text
+  metadata jsonb
+}
+
+Table entries {
+  id integer [primary key]
+  category_id integer [ref: > categories.id]
+  partner1_id integer [ref: > people.id]
+  partner2_id integer [ref: > people.id]
+  number integer
+  metadata jsonb
+}
+
+Table marks {
+  id integer [primary key]
+  round_id integer [ref: > rounds.id]
+  marks jsonb
+}

@@ -21,6 +21,11 @@ dist/
 .DS_Store
 *.swp
 
+# --- Database ---
+*.db
+*.sqlite3
+sb.sql
+
 # --- Post-Markem Specifics ---
 
 # 1. Raw Input Data
