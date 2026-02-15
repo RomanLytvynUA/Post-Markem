@@ -1,4 +1,4 @@
-from db.utilities import execute_write, execute_read_one, execute_read_all
+from .utilities import execute_write, execute_read_one, execute_read_all
 
 def create_category(competition_id, name, metadata=None):
     return execute_write("INSERT INTO categories (competition_id, name, metadata) VALUES (?, ?, ?)", 

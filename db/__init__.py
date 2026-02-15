@@ -1,9 +1,8 @@
-import sqlite3
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "post_markem.db")
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    return conn
+from .competitions import *
+from .categories import *
+from .rounds import *
+from .people import *
+from .adjudicators import *
+from .entries import *
+from .marks import *
+from .setup import *

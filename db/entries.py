@@ -1,4 +1,4 @@
-from db.utilities import execute_write, execute_read_one, execute_read_all
+from .utilities import execute_write, execute_read_one, execute_read_all
 
 def create_entry(category_id, number, partner1_id, partner2_id=None, metadata=None):
     return execute_write("INSERT INTO entries (category_id, number, partner1_id, partner2_id, metadata) VALUES (?, ?, ?, ?, ?)", 

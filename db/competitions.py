@@ -1,4 +1,4 @@
-from db.utilities import execute_write, execute_read_one, execute_read_all
+from .utilities import execute_write, execute_read_one, execute_read_all
 
 def create_competition(name, date=None, metadata=None):
     return execute_write("INSERT INTO competitions (name, date, metadata) VALUES (?, ?, ?)", (name, date, metadata))

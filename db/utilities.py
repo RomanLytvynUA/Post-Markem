@@ -1,5 +1,5 @@
 import sqlite3
-from db import get_db
+from .setup import get_db
 
 def _get_configured_connection():
     """Get a connection with dictionary-like row access"""

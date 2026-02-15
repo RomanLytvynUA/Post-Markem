@@ -1,7 +1,7 @@
 import json
 import io
 import pandas as pd
-from db.utilities import execute_write, execute_read_one, execute_read_all
+from .utilities import execute_write, execute_read_one, execute_read_all
 
 def save_marks(round_id, marks_json):
     existing = execute_read_one("SELECT id FROM marks WHERE round_id = ?", (round_id,))

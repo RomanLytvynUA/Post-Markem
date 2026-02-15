@@ -1,4 +1,12 @@
-from db import get_db
+import sqlite3
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "post_markem.db")
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    return conn
 
 def init_db():
     conn = get_db()

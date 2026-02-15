@@ -1,4 +1,4 @@
-from db.utilities import execute_write, execute_read_one, execute_read_all
+from .utilities import execute_write, execute_read_one, execute_read_all
 
 def create_adjudicator(round_id, person_id, letter, metadata=None):
     return execute_write("INSERT INTO adjudicators (round_id, people_id, letter, metadata) VALUES (?, ?, ?, ?)", 
