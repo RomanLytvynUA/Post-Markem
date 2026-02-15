@@ -4,14 +4,14 @@ import numpy as np
 
 def get_panel_final_accuracy(final_marks_df):
     """
-    Calculate the Spearman correlation for a single dance in the final
+    Calculate the correlation for a single dance in the final
     Return a Series with the correlation values, sorted in descending order
     """
     final_result = final_marks_df['place'].astype(float)
 
     judge_cols = [c for c in final_marks_df.columns if len(c) == 1 and c.isalpha()]
     
-    correlations = final_marks_df[judge_cols].apply(lambda x: x.corr(final_result, method='spearman')).round(2)
+    correlations = final_marks_df[judge_cols].apply(lambda x: x.corr(final_result)).round(2)
     
     return correlations.sort_values(ascending=False)
 
@@ -42,7 +42,6 @@ def get_overall_panel_final_accuracy(final_marks):
     # Sort
     return report.sort_values(by='overall_accuracy', ascending=False)
 
-
 def get_panel_final_bias(final_marks_df):
     """
     Calculates bias for a single dance in a final
@@ -57,7 +56,7 @@ def get_panel_final_bias(final_marks_df):
     # Calculate difference aligned by index
     bias_matrix = judges_df.sub(final_place, axis=0)
     
-    # 3. Melt for simplified merging
+    # Melt for simplified merging
     bias_long = bias_matrix.stack().reset_index()
     bias_long.columns = ['couple', 'judge', 'bias_value']
     
@@ -114,7 +113,7 @@ def get_correlation_pairs(df):
     if len(judge_cols) < 2:
         return pd.DataFrame(columns=['judge_1', 'judge_2', 'correlation'])
 
-    corr_matrix = df[judge_cols].astype(float).corr(method='spearman')
+    corr_matrix = df[judge_cols].astype(float).corr()
     
     # 3. Mask Lower Triangle & Diagonal (Keep Upper Triangle only)
     # k=1 excludes the diagonal (self-correlation)
