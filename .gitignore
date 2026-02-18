@@ -40,7 +40,6 @@ sb.sql
 *.parquet
 
 # 3. Visualizations
-*.png
 *.svg
 *.jpg
 *.jpeg
