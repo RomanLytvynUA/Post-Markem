@@ -54,7 +54,7 @@ def get_panel_final_bias(final_marks_df):
     final_place = final_marks_df['place'].astype(float)
     
     # Calculate difference aligned by index
-    bias_matrix = judges_df.sub(final_place, axis=0)
+    bias_matrix = judges_df.sub(final_place, axis=0).mul(-1)
     
     # Melt for simplified merging
     bias_long = bias_matrix.stack().reset_index()
@@ -170,7 +170,7 @@ def get_coalition_report(dances):
     return full_report[final_cols]
 
 
-def find_voting_blocs(report, threshold = 0.85):
+def find_voting_blocs(report, threshold = 0.8):
     """
     Identifies groups of judges who consistently agree with each other
     """
