@@ -1,0 +1,95 @@
+/* --- Typography Utilities --- */
+.text-status-excellent {
+    color: #16a34a;
+}
+
+.text-status-good {
+    color: #22c55e;
+}
+
+.text-status-average {
+    color: #eab308;
+}
+
+.text-status-below-average {
+    color: #f59e0b;
+}
+
+.text-status-poor {
+    color: #f97316;
+}
+
+.text-status-bad {
+    color: #ef4444;
+}
+
+.text-status-terrible {
+    color: #dc2626;
+}
+
+.text-status-critical {
+    color: #991b1b;
+}
+
+.text-ghost {
+    color: #9ca3af;
+}
+
+/* --- DaisyUI Tab Overrides --- */
+.tabs-lifted .tab-active,
+.tabs-lifted .tab:checked {
+    color: #000000 !important;
+    --tab-color: #000000 !important;
+    font-weight: 700;
+}
+
+.tabs-lifted .tab:checked:not(.tab-disabled):not([disabled]),
+.tabs-lifted .tab-active:not(.tab-disabled):not([disabled]) {
+    background-color: #ffffff !important;
+}
+
+/* --- Brand Button Overrides --- */
+.btn-primary {
+    background-color: #4D7CA2 !important;
+    border-color: #4D7CA2 !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover {
+    background-color: #4D7CA2 !important;
+    border-color: #4D7CA2 !important;
+    filter: brightness(0.9);
+}
+
+/* --- File Input Overrides --- */
+.file-input-bordered {
+    border-color: #D0D6DC;
+    background-color: #ffffff;
+    color: #1F272D;
+}
+
+.file-input-bordered:focus {
+    border-color: #4D7CA2;
+    outline: none;
+}
+
+.file-input-bordered::file-selector-button {
+    background-color: #4D7CA2;
+    color: #ffffff;
+    border: none;
+    transition: filter 0.2s;
+}
+
+.file-input-bordered::file-selector-button:hover {
+    background-color: #4D7CA2;
+    filter: brightness(0.9);
+}
+
+/* --- HTMX Utilities --- */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-indicator.htmx-request {
+    display: block;
+}
