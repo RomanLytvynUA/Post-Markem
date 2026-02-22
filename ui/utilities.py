@@ -70,7 +70,7 @@ def get_bias_data(marks, adjudicators, competitors, threshold=2):
     system_cols = ['judge', 'couple', 'overall_bias']
     dance_cols = [col for col in bias_df.columns if col not in system_cols]
     
-    # Use a dictionary to group reports by judge
+    # group reports by judge
     grouped_reports = defaultdict(list)
 
     for _, row in bias_df.iterrows():
@@ -90,20 +90,17 @@ def get_bias_data(marks, adjudicators, competitors, threshold=2):
             dances.append(f"{d}: {prefix}{d_val}")
         
         dancers = comp_map.get(couple_num, [{'name': 'Unknown'}, {'name': 'Unknown'}])
-        
         judge_display = f"{judge_letter} {adj_map.get(judge_letter, 'Unknown')}"
         
-        # Append to the existing array for this judge
         grouped_reports[judge_display].append({
             "overall": f"{'+' if val > 0 else ''}{val}",
-            "name1": dancers[0]['name'],
+            "name1": dancers[0]['name']if len(dancers) > 0 else couple_num,
             "name2": dancers[1]['name'] if len(dancers) > 1 else "",
             "number": couple_num,
             "type": status,
             "details": " / ".join(dances)
         })
 
-    # Return as a standard dict for Jinja
     return dict(grouped_reports)
 
 
@@ -115,12 +112,13 @@ def get_voting_blocs(marks, adjudicators):
 
     data = [
         {
+            "name": f"Bloc #{i+1}",
             "judges": [
                 {"letter": adj, "name": adj_map.get(adj, "Unknown")}
                 for adj in bloc
             ]
         }
-        for bloc in blocs
+        for i, bloc in enumerate(blocs)
     
     ]
     

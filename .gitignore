@@ -29,7 +29,7 @@ sb.sql
 # --- Post-Markem Specifics ---
 
 # 1. Raw Input Data
-*.html
+protocols/
 *.pdf
 *.xml
 

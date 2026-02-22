@@ -153,10 +153,10 @@ def get_coalition_report(dances):
     if not all_dance_pairs:
         return pd.DataFrame(columns=['judge_1', 'judge_2', 'overall_score'])
 
-    # Merge all dances (Outer Join aligns A-B correctly across dances)
+    # Merge all dances
     full_report = pd.concat(all_dance_pairs, axis=1)
     
-    # Calculate Overall Score (Mean)
+    # Calculate mean
     full_report['overall_score'] = full_report.mean(axis=1)
     
     # Cleanup & Sort
