@@ -1,0 +1,58 @@
+<div class="w-full mx-auto mb-5">
+    <h2 class="text-lg text-center font-serif font-extrabold text-brand-dark tracking-tight mb-2">
+        Voting Blocs Detection
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-min grid-flow-dense">
+        {% if voting_blocs|length > 0 %}
+        {% for bloc in voting_blocs %}
+        {% set is_large = bloc.judges|length >= 5 %}
+
+        <div class="card bg-white border border-brand-dust {{ 'md:col-span-2' if is_large else 'col-span-1' }}">
+            <div class="card-body p-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="card-title text-lg font-serif font-bold text-brand-dark">
+                        {{bloc.name}}
+                    </h3>
+                    <span class="badge text-center badge-ghost font-mono text-xs font-bold border-brand-dust/50">
+                        {{ bloc.judges|length }} Judges
+                    </span>
+                </div>
+
+                <div class="grid gap-y-2 mt-2 
+                            {{ 'grid-cols-1 sm:grid-cols-2 gap-x-6' if is_large else 'grid-cols-1' }}">
+
+                    {% for judge in bloc.judges %}
+                    <div class="flex items-center justify-between text-sm group cursor-default">
+                        <span class="font-mono font-bold text-brand-blue w-8 shrink-0">
+                            {{ judge.letter }}
+                        </span>
+
+                        <div class="dropdown dropdown-top dropdown-mid flex-1 min-w-0 group">
+                            <div tabindex="0" role="button"
+                                class="truncate font-medium text-brand-dark text-left block cursor-pointer select-none group-hover:text-brand-blue transition-colors">
+                                {{ judge.name }}
+                            </div>
+
+                            <div tabindex="0"
+                                class="dropdown-content z-[1] mb-1 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded shadow-sm w-max max-w-[200px] break-words">
+                                {{ judge.name }}
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-span-full text-center">
+            <p class="text-sm text-brand-dark opacity-70">
+                No significant voting blocs detected based on the current analysis. However, subtle biases or smaller
+                blocs may still exist and fall below the detection threshold.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>

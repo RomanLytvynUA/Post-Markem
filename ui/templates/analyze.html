@@ -1,0 +1,36 @@
+<div class="w-full max-w-md mx-auto">
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-serif font-bold text-brand-dark mb-2">
+            Protocol Analysis
+        </h1>
+        <p class="text-brand-dark opacity-70 text-sm">
+            Ingest FlyMark protocol data for statistical analysis of the competition results.
+        </p>
+    </div>
+
+    <form hx-post="/analyze" hx-encoding="multipart/form-data" hx-target="#results" hx-swap="innerHTML"
+        hx-indicator="#loading" class="flex flex-col gap-4">
+
+        <div class="form-control w-full">
+            <label class="label pt-0">
+                <span class="label-text font-bold text-brand-dark">Source File</span>
+                <span class="label-text-alt text-brand-slate">HTML</span>
+            </label>
+            <input type="file" name="file" accept=".html" required class="file-input file-input-bordered w-full" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full font-bold uppercase tracking-wider no-animation shadow-md">
+            Run Analysis
+        </button>
+    </form>
+
+    <div id="loading" class="htmx-indicator mt-6 text-center">
+        <div class="flex flex-col items-center gap-2">
+            <span class="loading loading-bars loading-lg text-brand-blue"></span>
+            <span class="text-xs font-bold text-brand-slate uppercase tracking-widest">Processing...</span>
+        </div>
+    </div>
+
+
+</div>
+<div id="results" class="mt-6"></div>

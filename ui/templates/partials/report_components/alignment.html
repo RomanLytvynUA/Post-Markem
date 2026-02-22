@@ -1,0 +1,42 @@
+<div class="w-full mx-auto mb-5">
+    <h2 class="text-lg text-center font-serif font-extrabold text-brand-dark tracking-tight mb-2">
+        Panel Alignment Assessment
+    </h2>
+    <div class="overflow-x-auto rounded-xl border border-brand-dust bg-white">
+        <table class="table bg-white">
+            <thead class="bg-brand-blue text-brand-white font-serif text-sm uppercase tracking-wide">
+                <tr>
+                    <th class="p-4 w-16"></th>
+                    <th class="p-4">Adjudicator</th>
+                    <th class="p-4 text-center">Overall Alignment</th>
+                    {% for dance_name in accuracy_table_data[0].dances.keys() %}
+                    <th class="text-center p-4">{{ dance_name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody class="text-sm">
+                {% for row in accuracy_table_data %}
+                <tr class="hover:bg-brand-blue/5 transition-colors">
+                    <td class="font-bold text-brand-blue p-4 text-center">{{ row.letter }}</td>
+                    <td class="font-medium text-brand-dark p-4">{{ row.name }}</td>
+
+                    <td class="p-4 text-center">
+                        <div class="badge badge-outline {{ 'text-' ~ row.overall.status }} font-bold">
+                            {{ (row.overall.val * 100)|int }}%
+                        </div>
+                    </td>
+
+                    {% for dance, data in row.dances.items() %}
+                    <td class="p-4 text-center font-mono">
+                        <span class="{{ 'text-' ~ data.status }}">
+                            {{ (data.val * 100)|int }}%
+                        </span>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

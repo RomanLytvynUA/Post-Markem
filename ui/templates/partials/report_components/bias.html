@@ -1,0 +1,99 @@
+<div class="w-full mx-auto mb-5">
+    <h2 class="text-lg text-center font-serif font-extrabold text-brand-dark tracking-tight mb-2">
+        Adjudicators Bias Estimation
+    </h2>
+
+    <div class="w-full">
+        <div role="tablist"
+            class="tabs tabs-bordered flex-nowrap overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {% for judge, data in bias_data.items() %}
+            <a role="tab" class="tab whitespace-nowrap {{ 'tab-active' if loop.first else '' }}"
+                onclick="openTab(event, 'tab-{{ loop.index }}')">
+                <span>
+
+                    <span class="text-brand-blue font-bold">{{ judge.split()[0] }} </span>{{ judge.split()[1:]|join(' ')
+                    }}
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="mt-0 p-6 bg-base-100 border border-base-300 rounded-b-lg rounded-t-none">
+            {% for judge, cases in bias_data.items() %}
+            <div id="tab-{{ loop.index }}" class="tab-content-panel {{ 'hidden' if not loop.first else '' }}">
+                <div class="max-w-5xl mx-auto">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+
+                        {% for case in cases %}
+                        <div
+                            class="group relative bg-white rounded-xl border border-brand-dust overflow-hidden w-full {{ 'grayscale-[0.5]' if case.type == 'neutral' }}">
+
+                            <div class="h-1 w-full 
+                                {% if case.type == 'favoritism' %} bg-emerald-500 
+                                {% elif case.type == 'opposition' %} bg-red-600 
+                                {% else %} bg-slate-300 {% endif %}">
+                            </div>
+
+                            <div class="p-3 flex items-center justify-between gap-1">
+                                <div class="flex flex-col gap-0.5">
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="px-1.5 py-0.5 bg-slate-100 font-mono text-[10px] font-bold rounded border border-brand-dust/50">
+                                            #{{ case.number }}
+                                        </span>
+                                        <h3 class="font-serif font-bold text-brand-dark text-[10px] leading-tight">
+                                            {{ case.name1 }} <span class="text-brand-slate font-light">&</span> {{
+                                            case.name2 }}
+                                        </h3>
+                                    </div>
+                                    <p
+                                        class="text-[9px] uppercase tracking-tight font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
+                                        {{ case.details }}
+                                    </p>
+
+                                </div>
+
+                                <div class="text-right">
+                                    <div class="flex flex-col items-end leading-none">
+                                        <span class="text-[15px] font-black tracking-tighter font-mono
+                                            {% if case.type == 'favoritism' %} text-emerald-600 
+                                            {% elif case.type == 'opposition' %} text-red-600 
+                                            {% else %} text-slate-500 {% endif %}">
+                                            {{ case.overall }}
+                                        </span>
+                                        <span class="text-[8px] uppercase font-bold mt-0.5
+                                            {% if case.type == 'favoritism' %} text-emerald-700/60 
+                                            {% elif case.type == 'opposition' %} text-red-700/60 
+                                            {% else %} text-slate-400 {% endif %}">
+                                            Average deviation
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        function openTab(evt, tabId) {
+            const panels = document.getElementsByClassName("tab-content-panel");
+            for (let i = 0; i < panels.length; i++) {
+                panels[i].classList.add("hidden");
+            }
+
+            const tabs = document.querySelectorAll("[role='tab']");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("tab-active");
+            }
+
+            document.getElementById(tabId).classList.remove("hidden");
+            evt.currentTarget.classList.add("tab-active");
+        }
+    </script>
+</div>

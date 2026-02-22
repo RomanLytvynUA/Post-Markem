@@ -93,3 +93,8 @@
 .htmx-indicator.htmx-request {
     display: block;
 }
+
+/*  */
+html {
+    scroll-behavior: smooth;
+}
