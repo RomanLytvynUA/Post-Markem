@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full mx-auto max-w-5xl">
+
+    <div class="mb-6 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-serif font-bold text-brand-dark tracking-tight">Events Directory</h1>
+            <p class="text-brand-slate mt-2 text-sm">Manage the archive of analyzed competitions.</p>
+        </div>
+        <button onclick="prepareNewEventModal()" class="btn btn-primary text-white shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Event
+        </button>
+    </div>
+
+    <div
+        class="flex flex-col md:flex-row gap-3 mb-8 bg-white p-4 rounded-xl border border-brand-dust shadow-sm relative">
+        <div class="flex-1 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-5 h-5 absolute left-3 top-3 text-brand-slate">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="text" id="searchInput" onkeyup="filterEvents()" placeholder="Search by event name..."
+                class="input input-bordered w-full pl-10 border-brand-dust focus:border-brand-blue focus:outline-none text-sm" />
+        </div>
+        <select id="sortSelect" onchange="sortEvents()"
+            class="select select-bordered border-brand-dust focus:border-brand-blue focus:outline-none text-sm font-medium">
+            <option value="date_desc">Newest First</option>
+            <option value="date_asc">Oldest First</option>
+            <option value="name_asc">Name (A-Z)</option>
+        </select>
+    </div>
+
+    <div id="eventsList" class="space-y-3">
+        {% for comp in competitions %}
+        <div id="event-card-{{ comp.id }}"
+            class="collapse collapse-arrow bg-white border border-brand-dust shadow-sm rounded-xl event-card"
+            data-search="{{ comp.name | lower }}" data-name="{{ comp.name }}" data-date="{{ comp.date }}">
+
+            <input type="checkbox" hx-get="/event/{{ comp.id }}" hx-target="#comp-details-{{ comp.id }}"
+                hx-trigger="change once" />
+
+            <div class="collapse-title p-0 flex items-center hover:bg-brand-alabaster/30 transition-colors pr-12">
+                <div class="flex-1 flex flex-col md:flex-row md:items-center gap-2 md:gap-6 p-5">
+                    <div
+                        class="font-mono text-[10px] font-bold text-brand-blue bg-brand-blue/10 px-3 py-1.5 rounded uppercase tracking-widest w-fit shrink-0">
+                        {{ comp.date }}
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="font-serif text-xl font-bold text-brand-dark">{{ comp.name }}</h2>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1 z-10" onclick="event.stopPropagation(); event.preventDefault();">
+                    <button class="btn btn-ghost btn-xs btn-square text-brand-slate hover:text-brand-blue"
+                        onclick="openEditEventModal('{{ comp.id }}', '{{ comp.name }}', '{{ comp.date }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                        </svg>
+                    </button>
+                    <button class="btn btn-ghost btn-xs btn-square text-brand-slate hover:text-red-600"
+                        hx-delete="/events/del/{{ comp.id }}" hx-target="#event-card-{{ comp.id }}" hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete this event?">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse-content px-5">
+                <div id="comp-details-{{ comp.id }}" class="pt-4 border-t border-brand-dust/50">
+                    <span class="loading loading-spinner text-brand-blue loading-sm"></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<dialog id="event_modal" class="modal">
+    <div class="modal-box bg-white border border-brand-dust">
+        <h3 class="font-serif font-bold text-xl text-brand-dark mb-4" id="event_modal_title">Event Details</h3>
+        <form id="event_form" onsubmit="submitEventForm(event)">
+            <input type="hidden" id="event_form_method" value="POST">
+            <input type="hidden" id="event_id_internal" value="">
+
+            <div class="form-control mb-3">
+                <label class="label"><span class="label-text font-medium text-brand-dark">Event Name</span></label>
+                <input type="text" id="event_name" class="input input-bordered w-full border-brand-dust" required />
+            </div>
+
+            <div class="form-control mb-3">
+                <label class="label"><span class="label-text font-medium text-brand-dark">Date</span></label>
+                <input type="date" id="event_date" class="input input-bordered w-full border-brand-dust" required />
+            </div>
+
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost"
+                    onclick="document.getElementById('event_modal').close()">Cancel</button>
+                <button type="submit" class="btn btn-primary text-white">Save Event</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<script>
+    function filterEvents() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.event-card').forEach(card => {
+            card.style.display = card.dataset.search.includes(input) ? "" : "none";
+        });
+    }
+
+    function sortEvents() {
+        const list = document.getElementById('eventsList');
+        const cards = Array.from(list.getElementsByClassName('event-card'));
+        const sortValue = document.getElementById('sortSelect').value;
+        cards.sort((a, b) => {
+            if (sortValue === 'name_asc') return a.dataset.name.localeCompare(b.dataset.name);
+            if (sortValue === 'date_asc') return a.dataset.date.localeCompare(b.dataset.date);
+            return b.dataset.date.localeCompare(a.dataset.date);
+        });
+        cards.forEach(card => list.appendChild(card));
+    }
+
+    function prepareNewEventModal() {
+        document.getElementById('event_form').reset();
+        document.getElementById('event_modal_title').innerText = "New Event";
+        document.getElementById('event_form_method').value = 'POST';
+        document.getElementById('event_id_internal').value = '';
+        document.getElementById('event_modal').showModal();
+    }
+
+    function openEditEventModal(id, name, date) {
+        document.getElementById('event_modal_title').innerText = "Edit Event";
+        document.getElementById('event_form_method').value = 'PUT';
+        document.getElementById('event_id_internal').value = id;
+        document.getElementById('event_name').value = name;
+        document.getElementById('event_date').value = date;
+        document.getElementById('event_modal').showModal();
+    }
+
+    async function submitEventForm(e) {
+        e.preventDefault();
+        const method = document.getElementById('event_form_method').value;
+        const id = document.getElementById('event_id_internal').value;
+
+        const url = (method === 'PUT') ? `/events/edit/${id}` : '/events/add';
+
+        const data = {
+            name: document.getElementById('event_name').value,
+            date: document.getElementById('event_date').value
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) location.reload();
+        } catch (err) {
+            console.error("Failed to save event:", err);
+        }
+    }
+</script>
+{% endblock %}

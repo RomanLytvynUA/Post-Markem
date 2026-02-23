@@ -1,13 +1,13 @@
-from flask import Flask, render_template, request
-from . import utilities as utl
+from flask import Blueprint, render_template, request
+from .. import utilities as utl
 
-app = Flask(__name__)
+main_bp = Blueprint('main', __name__)
 
-@app.route('/', methods=['GET'])
+@main_bp.route('/', methods=['GET'])
 def home():
     return render_template('home.html')
 
-@app.route('/analyze', methods=['POST'])
+@main_bp.route('/analyze', methods=['POST'])
 def analyze():
     file = request.files['file']
     
@@ -24,6 +24,3 @@ def analyze():
         accuracy_table_data=accuracy_table_data,
         bias_data=bias_data,
         voting_blocs=voting_blocs)
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5050)
