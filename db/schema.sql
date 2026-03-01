@@ -53,6 +53,7 @@ CREATE TABLE entries (
     partner1_id INTEGER NOT NULL,
     partner2_id INTEGER,
     number INTEGER,
+    place TEXT NOT NULL,
     metadata TEXT CHECK(json_valid(metadata)),
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
     FOREIGN KEY (partner1_id) REFERENCES people(id),

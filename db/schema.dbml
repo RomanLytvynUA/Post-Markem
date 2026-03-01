@@ -39,6 +39,7 @@ Table entries {
   partner1_id integer [ref: > people.id]
   partner2_id integer [ref: > people.id]
   number integer
+  place integer
   metadata jsonb
 }
 
