@@ -10,6 +10,10 @@ def save_marks(round_id, marks_json):
     else:
         return execute_write("INSERT INTO marks (round_id, marks) VALUES (?, ?)", (round_id, marks_json))
 
+def get_raw_marks(round_id):
+    data = execute_read_one("SELECT * FROM marks WHERE round_id = ?", (round_id,))
+    return data
+
 def get_marks(round_id):
     row = execute_read_one("SELECT * FROM marks WHERE round_id = ?", (round_id,))
     
