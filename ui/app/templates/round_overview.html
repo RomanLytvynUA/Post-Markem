@@ -1,0 +1,286 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-1">
+        <h2 class="text-sm uppercase tracking-wider font-semibold text-base-content/50 mb-3">Panel of Judges</h2>
+        <div class="bg-base-100 rounded-box border border-base-200 shadow-sm p-4 overflow-auto max-h-80">
+            <table class="table-auto text-left border-collapse w-full">
+                <tbody>
+                    {% for judge in adjudicators %}
+                    <tr>
+                        <td class="font-bold text-brand-blue pr-3 py-1 w-1 whitespace-nowrap align-middle">{{
+                            judge.letter }}.</td>
+                        <td class="text-sm text-base-content/80 py-1 align-middle">{{ judge.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="lg:col-span-2">
+        <h2 class="text-sm uppercase tracking-wider font-semibold text-base-content/50 mb-3">Competitors</h2>
+        <div class="bg-base-100 rounded-box border border-base-200 shadow-sm overflow-auto max-h-80">
+            <table class="table table-sm table-pin-rows w-full text-sm">
+                <thead>
+                    <tr class="bg-base-200/50 text-base-content/70">
+                        <th class="w-16 text-center font-medium bg-base-200/50">No.</th>
+                        <th class="w-16 text-center font-medium bg-base-200/50">Place</th>
+                        <th class="font-medium bg-base-200/50">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comp in competitors %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td class="text-center text-base-content/60">{{ comp.number }}</td>
+                        <td class="text-center font-semibold text-brand-blue">{{ comp.place }}</td>
+                        <td class="text-base-content/90">{{ comp.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-between items-center mb-3">
+    <h2 class="text-sm uppercase tracking-wider font-semibold text-base-content/50">Marking Protocols</h2>
+
+    <label class="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+        <span class="text-xs font-medium text-base-content/70">Tooltips</span>
+
+        <input type="checkbox" id="toggle-infobox" checked="checked"
+            class="toggle toggle-xs bg-base-content/30 border-base-content/30 checked:bg-base-content/50 checked:border-base-content/50" />
+    </label>
+</div>
+
+<div class="w-full" id="dance-marks-container">
+    <div role="tablist"
+        class="tabs tabs-bordered custom-tabs flex-nowrap overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mb-4">
+        {% for dance, dmarks in marks.items() %}
+        <a role="tab"
+            class="tab whitespace-nowrap text-base-content/60 hover:text-base-content transition-colors {{ 'tab-active' if loop.first else '' }}"
+            onclick="openMarkingTab(event, 'dance-tab-{{ loop.index }}')">
+            {{ dance }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="mt-0">
+        {% for dance, dmarks in marks.items() %}
+        <div id="dance-tab-{{ loop.index }}" id="dance-marks-panel"
+            class="tab-content-panel {{ 'hidden' if not loop.first else '' }}">
+            <div class="overflow-x-auto">
+                <div
+                    class="bg-base-100 rounded-box border border-base-200 shadow-sm z-0 relative crosshair-wrapper w-full">
+                    <table class="table table-xs !w-max min-w-full text-center table-crosshair border-collapse">
+                        <thead>
+                            <tr class="bg-base-200/50 text-base-content/70 border-b border-base-200">
+                                <th class="w-16 sticky left-0 font-medium py-2">No.</th>
+                                <th class="w-16 sticky left-0 font-medium border-r border-base-200 py-2">Place</th>
+
+                                {% for judge in adjudicators %}
+                                <th class="w-10 h-10 p-0 align-middle text-center font-medium"
+                                    data-judge="{{ judge.name }}">
+                                    <span class="custom-hover-tip w-full h-full flex items-center justify-center"
+                                        data-tip-text="{{judge.name}}" data-tip-pos="top">
+                                        {{ judge.letter }}
+                                    </span>
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="text-base-content/90">
+                            {% for row in dmarks %}
+                            {% set competitor = competitors | selectattr('number', 'equalto', row.number) | first %}
+                            {% set comp_name = competitor.name if competitor else 'Unknown' %}
+                            <tr data-competitor="{{ comp_name }}">
+                                <td class="text-base-content/60 sticky left-0 font-medium bg-base-100 p-0">
+                                    <span class="custom-hover-tip w-full h-full flex items-center justify-center"
+                                        data-tip-text="{{comp_name}}" data-tip-pos="left">
+                                        {{ row.number }}
+                                    </span>
+                                </td>
+                                <td
+                                    class="font-bold sticky left-0 text-brand-blue border-r border-base-200 bg-base-100">
+                                    {{ row.place }}
+                                </td>
+
+                                {% for judge in adjudicators %}
+                                <td class="w-10 h-10 p-0 align-middle text-center transition-all duration-75 mark-cell">
+                                    {{ row[judge.letter] }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<div id="floating-info-box"
+    class="fixed pointer-events-none hidden z-50 bg-brand-white px-3 py-2 rounded-box shadow-xl text-sm transition-opacity duration-150 border border-neutral-content/10">
+    <div class="font-bold text-brand-blue brightness-125" id="info-comp-name"></div>
+    <div class="opacity-50 font-semibold text-xs mt-0.5" id="info-judge-name"></div>
+</div>
+
+<div id="tiny-tooltip"
+    class="fixed pointer-events-none hidden z-[60] bg-neutral text-neutral-content text-xs px-2 py-1 rounded shadow-sm transition-opacity duration-150 whitespace-nowrap">
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const infoBox = document.getElementById('floating-info-box');
+        const compNameEl = document.getElementById('info-comp-name');
+        const judgeNameEl = document.getElementById('info-judge-name');
+        const tinyTooltip = document.getElementById('tiny-tooltip');
+        const enableInfoboxCheckbox = document.getElementById('toggle-infobox');
+
+        const markCells = document.querySelectorAll('.mark-cell');
+        const customTips = document.querySelectorAll('.custom-hover-tip');
+
+        enableInfoboxCheckbox.addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                infoBox.style.opacity = '0';
+                infoBox.style.display = 'none';
+                tinyTooltip.style.opacity = '0';
+                tinyTooltip.style.display = 'none';
+            }
+        });
+
+        customTips.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (!enableInfoboxCheckbox.checked) return;
+
+                tinyTooltip.textContent = el.dataset.tipText;
+                tinyTooltip.style.display = 'block';
+
+                requestAnimationFrame(() => {
+                    const rect = el.getBoundingClientRect();
+                    const pos = el.dataset.tipPos;
+
+                    if (pos === 'top') {
+                        tinyTooltip.style.top = (rect.top - tinyTooltip.offsetHeight - 6) + 'px';
+                        tinyTooltip.style.left = (rect.left + (rect.width / 2) - (tinyTooltip.offsetWidth / 2)) + 'px';
+                    } else if (pos === 'left') {
+                        tinyTooltip.style.top = (rect.top + (rect.height / 2) - (tinyTooltip.offsetHeight / 2)) + 'px';
+                        tinyTooltip.style.left = (rect.left - tinyTooltip.offsetWidth - 6) + 'px';
+                    }
+
+                    tinyTooltip.style.opacity = '1';
+                });
+            });
+
+            el.addEventListener('mouseleave', () => {
+                tinyTooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tinyTooltip.style.opacity === '0') {
+                        tinyTooltip.style.display = 'none';
+                    }
+                }, 150);
+            });
+        });
+
+        markCells.forEach(cell => {
+            cell.addEventListener('mouseenter', () => {
+                if (!enableInfoboxCheckbox.checked) return;
+
+                const tr = cell.closest('tr');
+                const table = cell.closest('table');
+                const cellIndex = cell.cellIndex;
+
+                const compName = tr.dataset.competitor;
+                const judgeName = table.querySelectorAll('thead th')[cellIndex]?.dataset.judge;
+
+                if (compName && judgeName) {
+                    compNameEl.textContent = compName;
+                    judgeNameEl.textContent = `Judge: ${judgeName}`;
+                    infoBox.style.display = 'block';
+                    setTimeout(() => infoBox.style.opacity = '1', 10);
+                }
+            });
+
+            cell.addEventListener('mousemove', (e) => {
+                if (!enableInfoboxCheckbox.checked) return;
+                infoBox.style.left = (e.clientX + 15) + 'px';
+                infoBox.style.top = (e.clientY + 15) + 'px';
+            });
+
+            cell.addEventListener('mouseleave', () => {
+                infoBox.style.opacity = '0';
+                setTimeout(() => {
+                    if (infoBox.style.opacity === '0') {
+                        infoBox.style.display = 'none';
+                    }
+                }, 150);
+            });
+        });
+    });
+
+    function openMarkingTab(evt, tabId) {
+        const container = document.getElementById("dance-marks-container");
+        const panels = container.getElementsByClassName("tab-content-panel");
+        for (let i = 0; i < panels.length; i++) {
+            panels[i].classList.add("hidden");
+        }
+
+        const tabs = container.querySelectorAll(".custom-tabs .tab");
+        for (let i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove("tab-active");
+        }
+
+        document.getElementById(tabId).classList.remove("hidden");
+        evt.currentTarget.classList.add("tab-active");
+    }
+
+</script>
+
+<style>
+    .crosshair-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .custom-tabs .tab {
+        border-color: var(--fallback-b2, oklch(var(--b2)));
+        font-weight: 500;
+    }
+
+    .custom-tabs .tab-active {
+        border-color: var(--fallback-bc, oklch(var(--bc)));
+        color: var(--fallback-bc, oklch(var(--bc)));
+        font-weight: 600;
+    }
+
+    .table-crosshair {
+        border-collapse: collapse;
+    }
+
+    .table-crosshair tbody td,
+    .table-crosshair thead th {
+        position: relative;
+    }
+
+    .table-crosshair tbody tr:hover td {
+        background-color: var(--fallback-b2, oklch(var(--b2)/0.3));
+    }
+
+    .table-crosshair tbody td:hover::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -5000px;
+        height: 10000px;
+        width: 100%;
+        background-color: var(--fallback-b2, oklch(var(--b2)/0.3));
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .table-crosshair tbody td:hover {
+        background-color: var(--fallback-b2, oklch(var(--b2)/0.6)) !important;
+    }
+</style>

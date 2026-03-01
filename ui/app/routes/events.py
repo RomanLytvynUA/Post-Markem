@@ -9,19 +9,15 @@ def get_events():
 
 @events_bp.route('/add', methods=["POST"])
 def add_event():
-    data = request.get_json()
-
-    db.competitions.create_competition(data.get("name"), data.get("date"))
+    comp_id = db.competitions.create_competition(request.form.get("name"), request.form.get("date"))
     
-    return render_template('events.html', competitions=db.list_competitions())
+    return render_template('partials/events_components/event_card.html', comp=db.competitions.get_competition(comp_id))
 
 @events_bp.route('/edit/<string:comp_id>', methods=["PUT"])
 def edit_event(comp_id):
-    data = request.get_json()
-
-    db.competitions.update_competition(comp_id, data.get("name"), data.get("date"))
+    db.competitions.update_competition(comp_id, request.form.get("name"), request.form.get("date"))
     
-    return render_template('events.html', competitions=db.list_competitions())
+    return render_template('partials/events_components/event_card.html', comp=db.competitions.get_competition(comp_id))
 
 @events_bp.route('/del/<string:comp_id>', methods=["DELETE"])
 def del_event(comp_id):
@@ -41,7 +37,7 @@ def del_event(comp_id):
 @events_bp.route('/get/<string:comp_id>')
 def get_event_details(comp_id):
     categories = db.list_categories(comp_id)
-    return render_template("partials/comp_details.html", data=[
+    return render_template("partials/events_components/comp_details.html", comp_id=comp_id, data=[
         {**category, "rounds": db.list_rounds(category["id"])} 
         for category in categories
     ])

@@ -1,0 +1,96 @@
+<div class="bg-white rounded-lg shadow-sm p-2">
+    <div class="divide-y divide-brand-dust/30 pb-2" id="categories_list">
+        {% for category in data %}
+        {% include "partials/events_components/category_row.html" %}
+        {% endfor %}
+    </div>
+
+    <div class="pt-3">
+        <button
+            class="btn btn-sm btn-ghost w-full border border-dashed border-brand-dust text-brand-slate hover:border-brand-blue hover:text-brand-blue hover:bg-transparent"
+            onclick="openCategoryModal('{{ comp_id }}')">
+            + Add New Category
+        </button>
+    </div>
+</div>
+
+<dialog id="category_modal" class="modal">
+    <div class="modal-box bg-white border border-brand-dust max-w-lg">
+        <h3 class="font-serif font-bold text-xl text-brand-dark mb-4">Add Category</h3>
+
+        <form id="category_form" hx-post="/categories/add" hx-target="#categories_list" hx-swap="beforeend"
+            hx-on::after-request="if(event.detail.successful) { this.reset(); resetRounds(); document.getElementById('category_modal').close(); }">
+
+            <input type="hidden" name="comp_id" id="modal_comp_id">
+
+            <div class="form-control mb-6">
+                <label class="label"><span class="label-text font-medium text-brand-dark">Category Name</span></label>
+                <input type="text" id="category_name" name="name"
+                    class="input input-bordered w-full border-brand-dust focus:border-brand-blue" required />
+            </div>
+
+            <div
+                class="divider text-brand-slate text-xs uppercase tracking-widest font-bold before:bg-brand-dust/50 after:bg-brand-dust/50">
+                Rounds
+            </div>
+
+            <div class="mb-2">
+                <p class="text-xs text-brand-slate mb-3">Add the sequence of rounds.</p>
+                <div id="rounds_container" class="space-y-2 mb-4">
+                    <div class="flex items-center gap-2 round-row">
+                        <input type="text" name="rounds[]"
+                            class="input input-bordered input-sm w-full border-brand-dust focus:border-brand-blue font-mono text-sm"
+                            required />
+                        <div class="w-8"></div>
+                    </div>
+                </div>
+
+                <button type="button"
+                    class="btn btn-sm btn-ghost w-full border border-dashed border-brand-dust text-brand-slate hover:border-brand-blue hover:text-brand-blue hover:bg-transparent"
+                    onclick="addRoundInput()">
+                    + Add Another Round
+                </button>
+            </div>
+
+            <div class="modal-action mt-6 pt-4 border-t border-brand-dust/50">
+                <button type="button" class="btn btn-ghost"
+                    onclick="document.getElementById('category_modal').close()">Cancel</button>
+                <button type="submit" class="btn btn-primary text-white">Save Category</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<script>
+    function openCategoryModal(compId) {
+        const compIdInput = document.getElementById('modal_comp_id');
+        if (compIdInput) compIdInput.value = compId;
+        resetRounds();
+        document.getElementById('category_modal').showModal();
+    }
+
+    function addRoundInput() {
+        const container = document.getElementById('rounds_container');
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 round-row';
+        row.innerHTML = `
+            <input type="text" name="rounds[]" class="input input-bordered input-sm w-full border-brand-dust focus:border-brand-blue font-mono text-sm" required />
+            <button type="button" class="btn btn-ghost hover:bg-red-100 btn-sm btn-square text-brand-slate hover:text-red-600" onclick="this.parentElement.remove()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        container.appendChild(row);
+    }
+
+    function resetRounds() {
+        const container = document.getElementById('rounds_container');
+        const rows = container.querySelectorAll('.round-row');
+        rows.forEach((row, index) => {
+            if (index > 0) row.remove();
+            else row.querySelector('input').value = '';
+        });
+    }
+</script>
