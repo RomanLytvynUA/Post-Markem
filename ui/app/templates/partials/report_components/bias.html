@@ -3,7 +3,7 @@
         Adjudicators Bias Estimation
     </h2>
 
-    <div class="w-full">
+    <div class="w-full" id="bias_tabs">
         <div role="tablist"
             class="tabs tabs-bordered flex-nowrap overflow-x-auto w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {% for judge, data in bias_data.items() %}
@@ -82,12 +82,13 @@
     </div>
     <script>
         function openTab(evt, tabId) {
-            const panels = document.getElementsByClassName("tab-content-panel");
+            const container = document.getElementById("bias_tabs")
+            const panels = container.getElementsByClassName("tab-content-panel");
             for (let i = 0; i < panels.length; i++) {
                 panels[i].classList.add("hidden");
             }
 
-            const tabs = document.querySelectorAll("[role='tab']");
+            const tabs = container.querySelectorAll("[role='tab']");
             for (let i = 0; i < tabs.length; i++) {
                 tabs[i].classList.remove("tab-active");
             }
