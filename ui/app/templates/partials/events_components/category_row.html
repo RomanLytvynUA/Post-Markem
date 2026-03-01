@@ -1,0 +1,147 @@
+<div id="cat-row-{{ category.id }}" class="category-row group py-4 px-2 -mx-2 rounded transition-colors"
+    data-id="{{ category.id }}">
+
+    <div class="view-state flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <div class="font-medium text-brand-dark text-sm">{{ category.name }}</div>
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                <button type="button" class="text-brand-slate hover:text-brand-blue"
+                    onclick="toggleEdit('{{ category.id }}', true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-3.5 h-3.5">
+                        <path
+                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                    </svg>
+                </button>
+                <button class="text-brand-slate hover:text-red-600" hx-delete="/categories/del/{{ category.id }}"
+                    hx-target="#cat-row-{{ category.id }}" hx-swap="outerHTML" hx-confirm="Delete this category?">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-3.5 h-3.5">
+                        <path
+                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            {% for round in category.rounds %}
+            <a href="/categories/display/{{ round.id }}"
+                class="btn btn-xs btn-outline border-brand-dust text-brand-dark font-mono hover:bg-brand-blue hover:text-white">
+                {{ round.type }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form class="edit-state hidden flex-col gap-4" hx-put="/categories/edit/{{ category.id }}"
+        hx-target="#cat-row-{{ category.id }}" hx-swap="outerHTML">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex-1">
+                <label class="text-[10px] uppercase tracking-wider text-brand-slate font-bold">Category Name</label>
+                <input type="text" name="name" value="{{ category.name }}"
+                    class="input input-sm input-bordered w-full max-w-md focus:border-brand-blue font-medium" required>
+            </div>
+            <div class="flex items-center gap-2 pt-4">
+                <button type="button" onclick="toggleEdit('{{ category.id }}', false)"
+                    class="btn btn-xs btn-ghost text-brand-slate">Cancel</button>
+                <button type="submit" class="btn btn-xs btn-primary text-white px-4">Save Changes</button>
+            </div>
+        </div>
+
+        <div class="border-t border-brand-dust/50 pt-3">
+            <div class="flex items-center justify-between mb-2">
+                <label class="text-[10px] uppercase tracking-widest text-brand-slate font-bold">Edit Rounds</label>
+
+                <button type="button" onclick="addNewRoundField('{{ category.id }}')"
+                    class="text-[10px] font-bold text-brand-blue hover:text-brand-dark flex items-center gap-1 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
+                        <path
+                            d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                    </svg>
+                    ADD ROUND
+                </button>
+            </div>
+
+            <div id="rounds-edit-container-{{ category.id }}" class="flex flex-wrap gap-2">
+                {% for round in category.rounds %}
+                <div class="flex items-center bg-white border border-brand-dust rounded-md overflow-hidden shadow-sm">
+                    <input type="hidden" name="round_ids[]" value="{{ round.id }}">
+                    <input type="text" name="round_names[]" value="{{ round.type }}"
+                        class="input input-ghost input-xs w-28 font-mono focus:bg-brand-alabaster focus:outline-none px-2 text-xs"
+                        required>
+                    <button type="button" onclick="this.parentElement.remove()"
+                        class="px-1.5 py-1 hover:bg-red-50 hover:text-red-600 border-l border-brand-dust bg-brand-alabaster/20 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-3 h-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <p class="text-[9px] text-brand-slate mt-2 italic">* New rounds will be created; removed rounds will be
+                deleted on save.</p>
+        </div>
+    </form>
+</div>
+<style>
+    .edit-state {
+        display: none !important;
+    }
+
+    .view-state {
+        display: flex !important;
+    }
+
+    .category-row.is-editing .edit-state {
+        display: flex !important;
+    }
+
+    .category-row.is-editing .view-state {
+        display: none !important;
+    }
+
+    .category-row.is-editing {
+        background-color: #fdfdfd;
+        outline: 1px solid #3b82f6;
+    }
+</style>
+
+<script>
+    function toggleEdit(id, show) {
+        const row = document.getElementById(`cat-row-${id}`);
+        if (!row) return;
+
+        if (show) {
+            row.classList.add('is-editing');
+            // Timeout ensures focus happens after display change
+            setTimeout(() => {
+                row.querySelector('input[name="name"]').focus();
+            }, 10);
+        } else {
+            row.classList.remove('is-editing');
+        }
+    }
+
+    function addNewRoundField(categoryId) {
+        const container = document.getElementById(`rounds-edit-container-${categoryId}`);
+        const newRound = document.createElement('div');
+        newRound.className = 'flex items-center bg-white border border-brand-blue/30 rounded-md overflow-hidden shadow-sm animate-in fade-in zoom-in duration-200';
+
+        newRound.innerHTML = `
+        <input type="hidden" name="round_ids[]" value="">
+        <input type="text" name="round_names[]" placeholder="Round Name" 
+               class="input input-ghost input-xs w-28 font-mono focus:bg-brand-alabaster focus:outline-none px-2 text-xs" required>
+        <button type="button" onclick="this.parentElement.remove()" 
+                class="px-1.5 py-1 hover:bg-red-50 hover:text-red-600 border-l border-brand-blue/30 bg-brand-blue/5 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    `;
+
+        container.appendChild(newRound);
+        newRound.querySelector('input[type="text"]').focus();
+    }
+</script>

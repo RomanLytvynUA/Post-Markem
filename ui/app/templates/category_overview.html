@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full mx-auto max-w-6xl pb-16 px-4">
+
+    <div class="mb-8 flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-sm font-medium text-base-content/50">
+            <a href="/events" class="inline-flex items-center gap-1 hover:text-brand-blue transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                All events
+            </a>
+
+            {% if competition %}
+            <span class="text-base-content/30">/</span>
+            <span class="text-xs font-bold text-brand-blue uppercase tracking-widest mt-0.5">
+                {{ competition.name }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h1 class="text-3xl md:text-4xl font-serif font-bold text-base-content tracking-tight">
+                {{ category.name }}
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-2">
+                {% for r in rounds %}
+                <a href="/categories/display/{{ r.id }}" class="btn btn-xs font-mono transition-colors
+                    {% if r.id == selected_round %}
+                        btn-primary text-white font-bold
+                    {% else %}
+                        btn-outline border-brand-dust text-brand-dark font-normal hover:bg-brand-blue hover:border-brand-blue hover:text-white
+                    {% endif %}">
+                    {{ r.type }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-base-200 pb-px mb-8">
+
+        <div id="main-tabs-group" role="tablist" class="tabs tabs-bordered">
+            <a role="tab" class="tab tab-active text-brand-blue font-bold border-brand-blue"
+                onclick="switchMainTab(event, 'overview')">Overview</a>
+            <a role="tab" class="tab font-medium text-base-content/60 hover:text-base-content"
+                onclick="switchMainTab(event, 'analysis')">Analysis</a>
+        </div>
+
+        <button onclick="document.getElementById('upload_modal').showModal()"
+            class="btn btn-sm btn-outline border-brand-dust text-brand-dark hover:bg-brand-blue hover:border-brand-blue hover:text-white mb-1 flex items-center gap-1.5 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            Upload Data
+        </button>
+    </div>
+
+    <div id="main-tab-overview" class="main-tab-pane block">
+        {% if data_missing %}
+        <div class="bg-white rounded-xl border border-brand-dust border-dashed p-12 text-center text-base-content/50">
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-10 h-10 mx-auto mb-3 opacity-50">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+            </svg>
+
+            <p class="font-medium text-base-content/70">Round Overview</p>
+            <p class="text-sm mt-1">The data regarding the selected round will appear here after the upload.</p>
+        </div>
+        {% else %}
+        {% include "round_overview.html" %}
+        {% endif %}
+    </div>
+
+    <div id="main-tab-analysis" class="main-tab-pane hidden">
+        <div class="bg-white rounded-xl border border-brand-dust border-dashed p-12 text-center text-base-content/50">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-10 h-10 mx-auto mb-3 opacity-50">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+            </svg>
+            <p class="font-medium text-base-content/70">Analysis</p>
+            <p class="text-sm mt-1 mb-2">Judge bias metrics and performance trends will appear here.</p>
+            <form id="analyse_form" hx-post="/analyse_round/{{selected_round}}" hx-target="#main-tab-analysis"
+                hx-swap="innerHTML">
+                <input name="round_id" value="{{selected_round}}" type="hidden" />
+                <button type="submit" id="run_analysis_btn" class="btn btn-sm btn-primary text-white">Analyse
+                    Round</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<dialog id="upload_modal" class="modal">
+    <div class="modal-box bg-white border border-brand-dust">
+        <h3 class="font-serif font-bold text-xl text-brand-dark mb-1">Import Round Data</h3>
+        <p class="text-sm text-base-content/60 mb-6">Upload the round protocol data for future analysis.</p>
+
+        <form id="upload_form" onsubmit="handleUpload(event)">
+            <input name="comp_id" value="{{competition.id}}" type="hidden" />
+            <input name="cat_id" value="{{category.id}}" type="hidden" />
+            <input name="round_id" value="{{selected_round}}" type="hidden" />
+            <div class="form-control mb-4">
+                <label class="label"><span class="label-text font-medium text-brand-dark">Source Format</span></label>
+                <select name="extraction_type"
+                    class="select select-bordered w-full border-brand-dust focus:border-brand-blue focus:outline-none">
+                    <option value="fm_html">FlyMark round protocol (HTML)</option>
+                </select>
+            </div>
+
+            <div class="form-control mb-8">
+                <label class="label"><span class="label-text font-medium text-brand-dark">Select File</span></label>
+                <input type="file" name="file" required
+                    class="file-input file-input-bordered w-full border-brand-dust focus:border-brand-blue bg-slate-50" />
+            </div>
+
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost"
+                    onclick="document.getElementById('upload_modal').close()">Cancel</button>
+                <button type="submit" id="upload_submit_btn" class="btn btn-primary text-white">Process Data</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<script>
+    function switchMainTab(event, tabId) {
+        // 1. Hide all main tab panes
+        document.querySelectorAll('.main-tab-pane').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('block');
+        });
+
+        // 2. ONLY reset tabs inside the main navigation group
+        document.querySelectorAll('#main-tabs-group .tab').forEach(el => {
+            el.classList.remove('tab-active', 'text-brand-blue', 'font-bold', 'border-brand-blue');
+            el.classList.add('text-base-content/60', 'font-medium');
+        });
+
+        // 3. Show selected pane
+        document.getElementById('main-tab-' + tabId).classList.remove('hidden');
+        document.getElementById('main-tab-' + tabId).classList.add('block');
+
+        // 4. Highlight clicked tab
+        event.currentTarget.classList.remove('text-base-content/60', 'font-medium');
+        event.currentTarget.classList.add('tab-active', 'text-brand-blue', 'font-bold', 'border-brand-blue');
+    }
+    async function handleUpload(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const submitBtn = document.getElementById('upload_submit_btn');
+
+        const originalText = submitBtn.innerText;
+        submitBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Processing...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch('/categories/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert("Upload failed. Please check the server logs.");
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            alert("A network error occurred.");
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}
