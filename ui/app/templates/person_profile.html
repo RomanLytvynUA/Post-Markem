@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full mx-auto max-w-5xl">
+
+    <div class="mb-8 flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-sm font-medium text-base-content/50">
+            <a href="/people" class="inline-flex items-center gap-1 hover:text-brand-blue transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Directory
+            </a>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h1 class="text-3xl md:text-4xl font-serif font-bold text-brand-dark tracking-tight">
+                {{ person_data.name }}
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-2">
+                {% if adjudications|length > 0 %}
+                <span class="badge custom-badge-adj font-medium py-3 px-4">Adjudicator</span>
+                {% endif %}
+                {% if entries|length > 0 %}
+                <span class="badge custom-badge-comp font-medium py-3 px-4">Competitor</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="flex flex-col md:flex-row gap-3 mb-6 bg-white p-4 rounded-xl border border-brand-dust shadow-sm relative">
+        <div class="flex-1 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-5 h-5 absolute left-3 top-3 text-brand-slate">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="text" id="searchInput" onkeyup="updateList()" placeholder="Search competitions..."
+                class="input input-bordered w-full pl-10 border-brand-dust focus:border-brand-blue focus:outline-none text-sm" />
+        </div>
+        <select id="sortSelect" onchange="updateList()"
+            class="select select-bordered border-brand-dust focus:border-brand-blue focus:outline-none text-sm font-medium">
+            <option value="date_desc">Newest First</option>
+            <option value="date_asc">Oldest First</option>
+            <option value="name_asc">Name (A-Z)</option>
+        </select>
+    </div>
+
+    {% set default_adj = entries|length == 0 and adjudications|length > 0 %}
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-base-200 pb-px mb-8">
+        <div id="main-tabs-group" role="tablist" class="tabs tabs-bordered">
+            <a role="tab" id="tab-btn-adj"
+                class="tab {% if default_adj %}tab-active text-brand-blue font-bold border-brand-blue{% else %}font-medium text-base-content/60 border-transparent hover:text-base-content{% endif %}"
+                onclick="switchMainTab(event, 'adjudicator')">Adjudicator Records</a>
+            <a role="tab" id="tab-btn-comp"
+                class="tab {% if not default_adj %}tab-active text-brand-blue font-bold border-brand-blue{% else %}font-medium text-base-content/60 border-transparent hover:text-base-content{% endif %}"
+                onclick="switchMainTab(event, 'competitor')">Competitor Records</a>
+        </div>
+    </div>
+
+    <div id="tab-competitor" class="tab-content {% if not default_adj %}block{% else %}hidden{% endif %}">
+        <div class="list-container space-y-3">
+            {% for comp in entries %}
+            <div class="collapse collapse-arrow bg-white border border-brand-dust shadow-sm rounded-xl event-card"
+                data-search="{{ comp.name | lower }}" data-name="{{ comp.name }}" data-date="{{ comp.date }}">
+
+                <input type="checkbox">
+
+                <div class="collapse-title p-0 flex items-center hover:bg-brand-alabaster/30 transition-colors pr-12">
+                    <div class="flex-1 flex flex-col md:flex-row md:items-center gap-2 md:gap-6 p-5">
+                        <div
+                            class="font-mono text-[10px] font-bold text-brand-blue bg-brand-blue/10 px-3 py-1.5 rounded uppercase tracking-widest w-fit shrink-0">
+                            {{ comp.date if comp.date else 'None' }}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="font-serif text-xl font-bold text-brand-dark">{{ comp.name }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapse-content px-5">
+                    <div class="pt-4 border-t border-brand-dust/50">
+                        <div class="bg-white rounded-lg shadow-sm p-2">
+                            <div class="divide-y divide-brand-dust/30 pb-2">
+                                {% for cat in comp.categories %}
+                                <div class="category-row group py-4 px-2 -mx-2 rounded transition-colors">
+                                    <div
+                                        class="view-state flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="font-medium text-brand-dark text-sm">{{ cat.name }}</div>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="/categories/display/{{ cat.round_id }}"
+                                                class="btn btn-xs btn-outline border-brand-dust text-brand-dark font-mono hover:bg-brand-blue hover:text-white flex items-center gap-1">
+                                                Results
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-10 bg-white border border-brand-dust shadow-sm rounded-xl empty-state">
+                <p class="text-brand-slate">No competitor records found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="tab-adjudicator" class="tab-content {% if default_adj %}block{% else %}hidden{% endif %}">
+        <div class="list-container space-y-3">
+            {% for comp in adjudications %}
+            <div class="collapse collapse-arrow bg-white border border-brand-dust shadow-sm rounded-xl event-card"
+                data-search="{{ comp.name | lower }}" data-name="{{ comp.name }}" data-date="{{ comp.date }}">
+
+                <input type="checkbox">
+
+                <div class="collapse-title p-0 flex items-center hover:bg-brand-alabaster/30 transition-colors pr-12">
+                    <div class="flex-1 flex flex-col md:flex-row md:items-center gap-2 md:gap-6 p-5">
+                        <div
+                            class="font-mono text-[10px] font-bold text-brand-blue bg-brand-blue/10 px-3 py-1.5 rounded uppercase tracking-widest w-fit shrink-0">
+                            {{ comp.date if comp.date else 'None' }}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="font-serif text-xl font-bold text-brand-dark">{{ comp.name }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapse-content px-5">
+                    <div class="pt-4 border-t border-brand-dust/50">
+                        <div class="bg-white rounded-lg shadow-sm p-2">
+                            <div class="divide-y divide-brand-dust/30 pb-2">
+                                {% for cat in comp.categories %}
+                                <div class="category-row group py-4 px-2 -mx-2 rounded transition-colors">
+                                    <div
+                                        class="view-state flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="font-medium text-brand-dark text-sm">{{ cat.name }}</div>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            {% for round in cat.rounds %}
+                                            <a href="/categories/display/{{ round.id }}"
+                                                class="btn btn-xs btn-outline border-brand-dust text-brand-dark font-mono hover:bg-brand-blue hover:text-white">
+                                                {{ round.name }}
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-10 bg-white border border-brand-dust shadow-sm rounded-xl empty-state">
+                <p class="text-brand-slate">No adjudicator records found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function updateList() {
+        const activeTab = document.querySelector('.tab-content.block');
+        if (!activeTab) return;
+
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const sortValue = document.getElementById('sortSelect').value;
+        const listContainer = activeTab.querySelector('.list-container');
+        const cards = Array.from(listContainer.getElementsByClassName('event-card'));
+
+        cards.forEach(card => {
+            card.style.display = card.dataset.search.includes(input) ? "" : "none";
+        });
+
+        cards.sort((a, b) => {
+            if (sortValue === 'name_asc') return a.dataset.name.localeCompare(b.dataset.name);
+
+            // Handle 'None' dates safely during sort
+            const dateA = a.dataset.date === 'None' ? '' : a.dataset.date;
+            const dateB = b.dataset.date === 'None' ? '' : b.dataset.date;
+
+            if (sortValue === 'date_asc') return dateA.localeCompare(dateB);
+            return dateB.localeCompare(dateA); // date_desc
+        });
+
+        cards.forEach(card => listContainer.appendChild(card));
+    }
+
+    function switchMainTab(event, tabName) {
+        document.querySelectorAll('#main-tabs-group .tab').forEach(tab => {
+            tab.classList.remove('tab-active', 'text-brand-blue', 'font-bold', 'border-brand-blue');
+            tab.classList.add('font-medium', 'text-base-content/60', 'border-transparent');
+        });
+
+        const clickedTab = event.currentTarget;
+        clickedTab.classList.add('tab-active', 'text-brand-blue', 'font-bold', 'border-brand-blue');
+        clickedTab.classList.remove('font-medium', 'text-base-content/60', 'border-transparent');
+
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+            content.classList.remove('block');
+        });
+
+        const targetContent = document.getElementById(`tab-${tabName}`);
+        if (targetContent) {
+            targetContent.classList.remove('hidden');
+            targetContent.classList.add('block');
+            updateList();
+        }
+    }
+</script>
+{% endblock %}

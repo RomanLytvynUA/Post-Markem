@@ -48,6 +48,26 @@
     background-color: #ffffff !important;
 }
 
+/* Soft Blue for Adjudicators */
+.custom-badge-adj {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.tabs-boxed .tab-active {
+    background-color: #4D7CA2 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+/* Soft Purple for Competitors */
+.custom-badge-comp {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
 /* --- Brand Button Overrides --- */
 .btn-primary {
     background-color: #4D7CA2 !important;
