@@ -48,3 +48,18 @@ Table marks {
   round_id integer [ref: > rounds.id]
   marks jsonb
 }
+
+Table alignment_records {
+  id integer [primary key]
+  alignment float
+  person_id integer [ref: > people.id]
+  marks_id integer [ref: > marks.id]
+}
+
+Table analytics_cache {
+  marks_id integer [primary key, ref: > marks.id]
+  alignment_cache jsonb
+  bias_cache jsonb
+  blocs_cache jsonb
+  last_calculated datetime
+}

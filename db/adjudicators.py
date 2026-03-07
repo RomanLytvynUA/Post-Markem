@@ -9,7 +9,7 @@ def get_adjudicator(adjudicator_id):
 
 def get_adjudicators_by_round(round_id):
     query = """
-        SELECT a.*, p.name 
+        SELECT a.*, p.name, p.id AS person_id
         FROM adjudicators a
         LEFT JOIN people p ON a.people_id = p.id
         WHERE a.round_id = ? 

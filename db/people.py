@@ -8,25 +8,34 @@ def get_people():
         SELECT 
             p.*,
             (
-                SELECT COALESCE(json_group_array(json_object(
-                    'id', e.id,
-                    'partner1_id', e.partner1_id,
-                    'partner2_id', e.partner2_id
-                )), '[]')
-                FROM entries e
+                SELECT COUNT(e.id) 
+                FROM entries e 
                 WHERE e.partner1_id = p.id OR e.partner2_id = p.id
             ) AS entries,
             (
-                SELECT COALESCE(json_group_array(json_object(
-                    'id', a.id,
-                    'people_id', a.people_id,
-                    'round_id', a.round_id
-                )), '[]')
-                FROM adjudicators a
+                SELECT COUNT(a.id) 
+                FROM adjudicators a 
                 WHERE a.people_id = p.id
             ) AS adjudicators
         FROM people p;
     """
+    return execute_read_all(query)
+
+def get_adjudicators_leaderboard():
+    query = """
+        SELECT
+            p.*,
+            COUNT(DISTINCT a.id) AS num_of_records,
+            ROUND(AVG(ar.alignment), 4) AS score
+        FROM people p
+        JOIN adjudicators a 
+            ON a.people_id = p.id
+        JOIN alignment_records ar 
+            ON ar.person_id = p.id
+        GROUP BY p.id
+        ORDER BY score DESC;
+    """
+
     return execute_read_all(query)
 
 def get_adjudication_records(person_id):
@@ -112,7 +121,15 @@ def get_entry_records(person_id):
     return list(comps.values())
 
 def get_person(person_id):
-    return execute_read_one("SELECT * FROM people WHERE id = ?", (person_id,))
+    query = """
+        SELECT 
+            p.*,
+            (SELECT COUNT(id) FROM alignment_records WHERE person_id = p.id) AS num_of_records,
+            COALESCE((SELECT ROUND(AVG(alignment), 4) FROM alignment_records WHERE person_id = p.id), 0) AS score
+        FROM people p
+        WHERE p.id = ?
+    """
+    return execute_read_one(query, (person_id,))
 
 def get_person_by_name(name):
     return execute_read_one("SELECT * FROM people WHERE name = ?", (name,))

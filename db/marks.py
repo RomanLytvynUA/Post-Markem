@@ -23,9 +23,9 @@ def get_marks(round_id):
             dance: pd.read_json(io.StringIO(df_json), orient='split') 
             for dance, df_json in raw_json.items()
         }
-        return parsed_marks
+        return parsed_marks, row['id']
 
-    return None
+    return None, None
 
 def delete_marks(round_id):
     return execute_write("DELETE FROM marks WHERE round_id = ?", (round_id,))

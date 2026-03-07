@@ -1,10 +1,13 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS alignment_records;
+DROP TABLE IF EXISTS analytics_cache;
 DROP TABLE IF EXISTS marks;
-DROP TABLE IF EXISTS entries;
 DROP TABLE IF EXISTS adjudicators;
+DROP TABLE IF EXISTS entries;
 DROP TABLE IF EXISTS rounds;
 DROP TABLE IF EXISTS categories;
+
 DROP TABLE IF EXISTS competitions;
 DROP TABLE IF EXISTS people;
 
@@ -65,4 +68,22 @@ CREATE TABLE marks (
     round_id INTEGER NOT NULL,
     marks TEXT CHECK(json_valid(marks)),
     FOREIGN KEY (round_id) REFERENCES rounds(id) ON DELETE CASCADE
+);
+
+CREATE TABLE alignment_records (
+    id INTEGER PRIMARY KEY,
+    alignment REAL,
+    person_id INTEGER,
+    marks_id INTEGER,
+    FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE CASCADE,
+    FOREIGN KEY (marks_id) REFERENCES marks(id) ON DELETE CASCADE
+);
+
+CREATE TABLE analytics_cache (
+    marks_id INTEGER PRIMARY KEY,
+    alignment_cache TEXT CHECK(json_valid(alignment_cache)),
+    bias_cache TEXT CHECK(json_valid(bias_cache)),
+    blocs_cache TEXT CHECK(json_valid(blocs_cache)),
+    last_calculated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (marks_id) REFERENCES marks(id) ON DELETE CASCADE
 );

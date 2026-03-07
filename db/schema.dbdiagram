@@ -7,8 +7,8 @@
     {
       "name": "people",
       "schemaName": "public",
-      "x": 1165.2613556921701,
-      "y": -276.3308186548663
+      "x": 16,
+      "y": 16
     },
     {
       "name": "competitions",
@@ -19,32 +19,44 @@
     {
       "name": "categories",
       "schemaName": "public",
-      "x": 424,
+      "x": 448,
       "y": 56
     },
     {
       "name": "rounds",
       "schemaName": "public",
-      "x": 904,
-      "y": 320
+      "x": 944,
+      "y": 56
     },
     {
       "name": "adjudicators",
       "schemaName": "public",
-      "x": 1336,
-      "y": 16
+      "x": 1376,
+      "y": 56
     },
     {
       "name": "entries",
       "schemaName": "public",
-      "x": 904,
-      "y": 56
+      "x": 944,
+      "y": 256
     },
     {
       "name": "marks",
       "schemaName": "public",
-      "x": 1336,
-      "y": 248
+      "x": 1376,
+      "y": 288
+    },
+    {
+      "name": "alignment_records",
+      "schemaName": "public",
+      "x": 1800,
+      "y": 16
+    },
+    {
+      "name": "analytics_cache",
+      "schemaName": "public",
+      "x": 1800,
+      "y": 216
     }
   ],
   "tableGroupCollapseStates": [],
@@ -166,6 +178,51 @@
         "round_id"
       ],
       "secondTableName": "marks",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "people",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "person_id"
+      ],
+      "secondTableName": "alignment_records",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "marks",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "marks_id"
+      ],
+      "secondTableName": "alignment_records",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "marks",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "marks_id"
+      ],
+      "secondTableName": "analytics_cache",
       "secondSchemaName": "public",
       "secondRelation": "*",
       "checkPoints": []

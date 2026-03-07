@@ -6,3 +6,4 @@ from .adjudicators import *
 from .entries import *
 from .marks import *
 from .setup import *
+from .analytics import *
