@@ -19,17 +19,64 @@
                 {{ person_data.name }}
             </h1>
 
-            <div class="flex flex-wrap items-center gap-2">
+            <!-- <div class="flex flex-wrap items-center gap-2">
                 {% if adjudications|length > 0 %}
                 <span class="badge custom-badge-adj font-medium py-3 px-4">Adjudicator</span>
                 {% endif %}
                 {% if entries|length > 0 %}
                 <span class="badge custom-badge-comp font-medium py-3 px-4">Competitor</span>
                 {% endif %}
-            </div>
+            </div> -->
         </div>
     </div>
+    {% if adjudications|length > 0 %}
+    <div class="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div
+            class="stats stats-vertical sm:stats-horizontal shadow-sm border border-brand-dust bg-white w-full rounded-xl overflow-hidden">
 
+            {% set protocols = namespace(count=0) %}
+            {% for comp in adjudications %}
+            {% for cat in comp.categories %}
+            {% set protocols.count = protocols.count + cat.rounds|length %}
+            {% endfor %}
+            {% endfor %}
+
+            <div class="stat px-6 py-5">
+                <div class="stat-figure text-brand-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="inline-block w-8 h-8 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="stat-title text-brand-dark font-bold text-sm uppercase tracking-wider">Protocols Analyzed
+                </div>
+
+                <div class="stat-value text-3xl font-serif text-brand-dark mt-1">{{ protocols.count }}</div>
+
+                <div class="stat-desc text-brand-dark/40 mt-1 font-medium">Total judging panels recorded</div>
+            </div>
+
+            <div class="stat px-6 py-5 border-t sm:border-t-0 sm:border-l border-brand-dust">
+                <div class="stat-figure text-brand-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="inline-block w-8 h-8 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="stat-title text-brand-dark font-bold text-sm uppercase tracking-wider">Panel Consensus</div>
+
+                <div class="stat-value text-3xl font-serif mt-1 text-{{ alignment_data.status }}">
+                    {{ alignment_data.score }}
+                </div>
+                <div class="stat-desc text-brand-dark/40 mt-1 font-medium">{{ alignment_data.comment }}</div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
     <div
         class="flex flex-col md:flex-row gap-3 mb-6 bg-white p-4 rounded-xl border border-brand-dust shadow-sm relative">
         <div class="flex-1 relative">

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full mx-auto max-w-5xl">
+
+    <div class="mb-8 flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-sm font-medium text-base-content/50">
+            <a href="/people" class="inline-flex items-center gap-1 hover:text-brand-blue transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Directory
+            </a>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-serif font-bold text-brand-dark tracking-tight">Adjudicator
+                    Leaderboard</h1>
+                <p class="text-brand-slate mt-2 text-sm">Ranked by overall panel consensus and historical accuracy.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-3 mb-6 bg-white p-4 rounded-xl border border-brand-dust shadow-sm">
+
+        <div class="flex-1 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-5 h-5 absolute left-3 top-2.5 text-brand-slate">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="text" id="searchInput" oninput="renderTable()" placeholder="Search adjudicators..."
+                class="input input-sm input-bordered w-full pl-10 border-brand-dust focus:border-brand-blue focus:outline-none" />
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+            <label class="text-xs font-bold text-brand-slate uppercase tracking-wider whitespace-nowrap">Min.
+                Protocols:</label>
+            <input type="number" id="minProtocols" oninput="renderTable()" min="0" value="0" placeholder="0"
+                class="input input-sm input-bordered w-20 border-brand-dust focus:border-brand-blue focus:outline-none text-center font-mono" />
+        </div>
+
+        <select id="sortMode" onchange="renderTable()"
+            class="select select-sm select-bordered border-brand-dust focus:border-brand-blue focus:outline-none font-medium w-full md:w-48">
+            <option value="score_desc">Highest Score</option>
+            <option value="score_asc">Lowest Score</option>
+            <option value="protocols_desc">Most Experienced</option>
+            <option value="name_asc">Name (A-Z)</option>
+        </select>
+    </div>
+
+    <div class="bg-white border border-brand-dust shadow-sm rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table w-full border-collapse">
+                <thead>
+                    <tr class="text-brand-slate text-[10px] uppercase tracking-widest border-b-2 border-brand-dust/60">
+                        <th class="w-20 text-center py-4 font-bold">Rank</th>
+                        <th class="py-4 font-bold">Adjudicator</th>
+                        <th class="text-center py-4 font-bold">Protocols analysed</th>
+                        <th class="py-4 font-bold">Consensus</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="empty-state" class="hidden text-center py-12">
+            <p class="text-brand-slate">No adjudicators found matching your criteria.</p>
+        </div>
+    </div>
+</div>
+
+<template id="row-template">
+    <tr class="group border-b border-brand-dust/50 last:border-0 hover:bg-brand-alabaster/30 transition-colors">
+
+        <td class="text-center py-4">
+            <div class="inline-flex items-center justify-center w-7 h-7 rounded font-mono font-bold text-sm transition-colors"
+                data-rank-container>
+                <span data-rank></span>
+            </div>
+        </td>
+
+        <td class="py-4">
+            <a href="#"
+                class="font-serif text-lg font-bold text-brand-dark group-hover:text-brand-blue transition-colors"
+                data-name></a>
+            <div class="text-xs text-brand-slate mt-0.5" data-city></div>
+        </td>
+
+        <td class="text-center py-4">
+            <span class="font-mono text-brand-dark font-medium rounded" data-protocols></span>
+        </td>
+
+        <td class="py-4">
+            <div class="flex flex-col">
+                <span class="text-xl font-bold font-serif" data-score></span>
+            </div>
+        </td>
+
+    </tr>
+</template>
+
+<script>
+    // 1. Data Initialization
+    let rawData = {{ data | tojson }};
+
+    let adjudicators = rawData.map(p => {
+        const rawScore = parseInt(p.alignment_data.score.replace('%', '')) || 0;
+        return {
+            id: p.id,
+            name: p.name,
+            city: p.metadata?.city || '',
+            protocols: p.num_of_records,
+            scoreValue: rawScore,
+            scoreString: p.alignment_data.score,
+            status: p.alignment_data.status,
+        };
+    });
+
+    // 2. Render Engine
+    function renderTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const minProtocols = parseInt(document.getElementById('minProtocols').value) || 0;
+        const sortMode = document.getElementById('sortMode').value;
+
+        const tbody = document.getElementById('leaderboard-body');
+        const emptyState = document.getElementById('empty-state');
+        const template = document.getElementById('row-template');
+
+        // Step 1: Filter out the adjudicators who don't match the criteria
+        let filtered = adjudicators.filter(adj => {
+            const matchesSearch = adj.name.toLowerCase().includes(query);
+            const matchesProtocols = adj.protocols >= minProtocols;
+            return matchesSearch && matchesProtocols;
+        });
+
+        // Step 2: Establish True Rank within this specific filtered group
+        // We temporarily sort by highest score to figure out who is 1st, 2nd, 3rd, etc.
+        filtered.sort((a, b) => b.scoreValue - a.scoreValue);
+        filtered.forEach((adj, index) => {
+            adj.trueRank = index + 1;
+        });
+
+        // Step 3: Now apply the user's requested display sorting
+        filtered.sort((a, b) => {
+            if (sortMode === 'score_desc') return b.scoreValue - a.scoreValue;
+            if (sortMode === 'score_asc') return a.scoreValue - b.scoreValue;
+            if (sortMode === 'protocols_desc') return b.protocols - a.protocols;
+            if (sortMode === 'name_asc') return a.name.localeCompare(b.name);
+            return 0;
+        });
+
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+            emptyState.classList.remove('hidden');
+            tbody.parentElement.classList.add('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            tbody.parentElement.classList.remove('hidden');
+
+            filtered.forEach((adj) => {
+                const clone = template.content.cloneNode(true);
+
+                // Print their true rank, regardless of where they are visually sitting in the table
+                const rankContainer = clone.querySelector('[data-rank-container]');
+                clone.querySelector('[data-rank]').textContent = adj.trueRank;
+
+                // The Gold/Silver/Bronze styling stays locked to the top 3 scores
+                if (adj.trueRank === 1) {
+                    rankContainer.classList.add('bg-yellow-400', 'text-yellow-900', 'shadow-sm');
+                } else if (adj.trueRank === 2) {
+                    rankContainer.classList.add('bg-slate-200', 'text-slate-700', 'shadow-sm');
+                } else if (adj.trueRank === 3) {
+                    rankContainer.classList.add('bg-orange-300', 'text-orange-900', 'shadow-sm');
+                } else {
+                    rankContainer.classList.add('text-brand-slate');
+                }
+
+                // Populate Name and City
+                const nameLink = clone.querySelector('[data-name]');
+                nameLink.textContent = adj.name;
+                nameLink.href = `/people/${adj.id}`;
+
+                clone.querySelector('[data-city]').textContent = adj.city;
+
+                // Populate Stats
+                clone.querySelector('[data-protocols]').textContent = adj.protocols;
+
+                const scoreEl = clone.querySelector('[data-score]');
+                scoreEl.textContent = adj.scoreString;
+                scoreEl.classList.add(`text-${adj.status}`);
+
+                tbody.appendChild(clone);
+            });
+        }
+    }
+
+    // Trigger render on load
+    document.addEventListener('DOMContentLoaded', renderTable);
+</script>
+{% endblock %}

@@ -23,7 +23,7 @@
                 </button>
             </a>
 
-            <a href="/leaderboard" class="tooltip tooltip-bottom before:text-xs" data-tip="Leaderboards">
+            <a href="/people/leaderboard" class="tooltip tooltip-bottom before:text-xs" data-tip="Leaderboards">
                 <button class="btn btn-ghost btn-circle text-white hover:bg-white/10 
                     {{ 'bg-white/20 ring-1 ring-white/50' if 'leaderboard' in request.path else '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -46,8 +46,9 @@
             </a>
 
             <a href="/people" class="tooltip tooltip-bottom before:text-xs" data-tip="People">
-                <button class="btn btn-ghost btn-circle text-white hover:bg-white/10 
-                    {{ 'bg-white/20 ring-1 ring-white/50' if 'people' in request.path else '' }}">
+                <button
+                    class="btn btn-ghost btn-circle text-white hover:bg-white/10 
+                    {{ 'bg-white/20 ring-1 ring-white/50' if 'people' in request.path and not 'leaderboard' in request.path else '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round"

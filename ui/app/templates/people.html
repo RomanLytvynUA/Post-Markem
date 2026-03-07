@@ -54,8 +54,8 @@
     const people = {{ data | tojson }}.map(p => ({
         id: p.id,
         name: p.name,
-        adj: JSON.parse(p.adjudicators || '[]').length,
-        comp: JSON.parse(p.entries || '[]').length
+        adj: p.adjudicators,
+        comp: p.entries
     }));
 
     let filterType = 'all';
