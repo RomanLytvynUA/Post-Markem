@@ -117,7 +117,12 @@ def get_competitors(f):
                     "name": " ".join(link.text.split()),
                     "id": link.get('href', '').split('/')[-1]
                 })
-            
+            if not len(dancers):
+                dancers = [{
+                    "name": f"Dancer #{number}",
+                    "id": None
+                }]
+
             # Determine type
             participation_type = "couple" if len(dancers) == 2 else "solo"
 
