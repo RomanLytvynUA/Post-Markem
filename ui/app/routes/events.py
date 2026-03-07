@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, Blueprint
 import db
+from .. import utilities as utl
 
 events_bp = Blueprint('events_bp', __name__)
 
@@ -21,17 +22,7 @@ def edit_event(comp_id):
 
 @events_bp.route('/del/<string:comp_id>', methods=["DELETE"])
 def del_event(comp_id):
-    for category in db.categories.list_categories(comp_id):
-        for entry in db.entries.list_entries(category["id"]):
-            db.entries.delete_entry(entry['id'])
-        for round in db.rounds.list_rounds(category["id"]):
-            for judge in db.adjudicators.get_adjudicators_by_round(round["id"]):
-                db.adjudicators.delete_adjudicator(judge['id'])
-            db.marks.delete_marks(round["id"])
-            db.rounds.delete_round(round['id'])
-        db.categories.delete_category(category['id'])
-    db.competitions.delete_competition(comp_id)
-
+    utl.delete_competition(comp_id)
     return ""
 
 @events_bp.route('/get/<string:comp_id>')

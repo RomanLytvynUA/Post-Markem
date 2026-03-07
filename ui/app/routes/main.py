@@ -13,10 +13,8 @@ def analyze():
     file = request.files['file']
     
     marks, competitors, adjudicators = utl.parse_data(file)
-
-    accuracy_table_data = utl.get_accuracy_table_data(marks, adjudicators)
-    bias_data = utl.get_bias_data(marks, adjudicators, utl.get_competitors_map(competitors))
-    voting_blocs = utl.get_voting_blocs(marks, adjudicators)
+    analytics_data = utl.get_analytics_data(marks)
+    accuracy_table_data, bias_data, voting_blocs = utl.format_analysis_display_data(analytics_data, utl.get_competitors_map(competitors), adjudicators)
 
     return render_template(
         'partials/report.html',
@@ -28,13 +26,15 @@ def analyze():
 
 @main_bp.route('/analyse_round/<int:round_id>', methods=['POST'])
 def analyze_round(round_id):
-    marks = db.marks.get_marks(round_id)
+    marks, marks_id = db.marks.get_marks(round_id)
     adjudicators = db.adjudicators.get_adjudicators_by_round(round_id)
     competitors = db.entries.get_round_entries(round_id)
 
-    accuracy_table_data = utl.get_accuracy_table_data(marks, adjudicators)
-    bias_data = utl.get_bias_data(marks, adjudicators, competitors)
-    voting_blocs = utl.get_voting_blocs(marks, adjudicators)
+    analytics_data = utl.get_analytics_data(marks, cached_marks_id=marks_id)
+
+    accuracy_table_data, bias_data, voting_blocs = utl.format_analysis_display_data(analytics_data, competitors, adjudicators)
+
+    utl.save_alignment_scores(analytics_data[0], adjudicators, marks_id)
 
     return render_template(
         'partials/report.html',

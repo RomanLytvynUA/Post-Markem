@@ -33,6 +33,7 @@ def edit_category(cat_id):
         if old_id not in new_round_ids:
             for judge in db.adjudicators.get_adjudicators_by_round(old_id):
                 db.adjudicators.delete_adjudicator(judge['id'])
+            db.analytics.delete_analytics_cache(db.marks.get_raw_marks(old_id)['id'])
             db.marks.delete_marks(old_id)
             db.rounds.delete_round(old_id)
 
@@ -50,15 +51,7 @@ def edit_category(cat_id):
 
 @categories_bp.route('/del/<string:cat_id>', methods=["DELETE"])
 def del_category(cat_id):
-    for entry in db.entries.list_entries(cat_id):
-        db.entries.delete_entry(entry['id'])
-    for round in db.rounds.list_rounds(cat_id):
-        for judge in db.adjudicators.get_adjudicators_by_round(round["id"]):
-            db.adjudicators.delete_adjudicator(judge['id'])
-        db.marks.delete_marks(round["id"])
-        db.rounds.delete_round(round['id'])
-    db.categories.delete_category(cat_id)
-
+    utl.delete_category_data(cat_id)
     return ""
 
 from flask import abort
@@ -79,11 +72,18 @@ def upload():
             utl.clear_adjudicators(round_id)
             utl.clear_entries(cat_id)
             utl.clear_marks(round_id)
+            
             utl.add_adjudicators(adjudicators, round_id)
             utl.add_entries(competitors, cat_id)
             db.marks.save_marks(round_id, marks)
         case _:
             pass
+    
+    # run and cache the analysis
+    marks, marks_id = db.marks.get_marks(round_id)
+    adjudicators = db.adjudicators.get_adjudicators_by_round(round_id)
+    analytics_data = utl.get_analytics_data(marks, cached_marks_id=marks_id)
+    utl.save_alignment_scores(analytics_data[0], adjudicators, marks_id)
 
     return "Upload complete", 200
 
@@ -113,7 +113,7 @@ def display_category(round_id):
  
     adjudicators = db.adjudicators.get_adjudicators_by_round(round_id)
 
-    raw_marks = db.marks.get_marks(round_id)
+    raw_marks, _ = db.marks.get_marks(round_id)
     marks = {}
     if raw_marks:
         for dance, df in raw_marks.items():

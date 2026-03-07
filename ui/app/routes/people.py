@@ -8,7 +8,6 @@ people_bp = Blueprint('people', __name__)
 
 @people_bp.route('/')
 def get_people():
-    
     data = db.people.get_people()
 
     return render_template('people.html', data=data)
@@ -18,8 +17,28 @@ def get_person(p_id):
     person = db.people.get_person(p_id)
     adjudications = db.people.get_adjudication_records(p_id)
     entries = db.people.get_entry_records(p_id)
+    
+    alignment_data = {
+        'score': f'{round(float(person["score"])*100, 2)}%',
+        'status': utl.get_score_status(person['score']),
+        'comment': utl.get_score_comment(person['score']),
+    }
 
-    return render_template('person_profile.html', person_data=person, adjudications=adjudications, entries=entries)
+    return render_template('person_profile.html', person_data=person, adjudications=adjudications, entries=entries, alignment_data=alignment_data)
+
+@people_bp.route("/leaderboard")
+def get_leaderboard():
+    data = db.people.get_adjudicators_leaderboard()
+
+    for person in data:
+        person["alignment_data"] = {
+        'score': f'{round(float(person["score"])*100, 2)}%',
+        'status': utl.get_score_status(person['score']),
+        'comment': utl.get_score_comment(person['score']),
+    }
+
+    print(data)
+    return render_template("leaderboard.html", data=data)
 
 @people_bp.route('/add', methods=["POST"])
 def add_person():
